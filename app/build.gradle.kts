@@ -28,11 +28,24 @@ android {
 }
 
 dependencies {
+    // Firebase
     implementation(platform("com.google.firebase:firebase-bom:34.9.0"))
     implementation("com.google.firebase:firebase-database")
     implementation("com.google.firebase:firebase-analytics")
+    
+    // AndroidX
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    
+    // Material Design
     implementation("com.google.android.material:material:1.11.0")
+    
+    // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.0")
+    
+    // Google Maps
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    
+    // Google Play Services (para ubicación)
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 }
