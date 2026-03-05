@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1a1a1a">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Contenedor de Bloqueo -->
+        <LinearLayout
+            android:id="@+id/layoutBloqueo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="20dp"
+            android:background="#1a1a1a"
+            android:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="¡REGISTRO PENDIENTE!"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#FF0000" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Envía este ID al administrador y espera a ser validado"
+                android:textAlignment="center"
+                android:layout_marginTop="10dp"
+                android:textSize="16sp"
+                android:textColor="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/txtIDUsuario"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ID: Generando..."
+                android:textStyle="bold"
+                android:background="#2a2a2a"
+                android:padding="15dp"
+                android:layout_marginTop="20dp"
+                android:textSize="18sp"
+                android:textColor="#00FF00" />
+
+            <Button
+                android:id="@+id/btnPedirActivacion"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="Enviar ID por WhatsApp"
+                android:layout_marginTop="20dp"
+                android:backgroundTint="#25D366"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- Contenedor del Bot (Oculto hasta activación) -->
+        <LinearLayout
+            android:id="@+id/layoutFuncionesBot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:background="#1a1a1a"
+            android:visibility="gone">
+
+            <!-- Encabezado -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="BlackBotEk"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="#00FF00"
+                android:gravity="center"
+                android:layout_marginBottom="20dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="¡BOT ACTIVO!"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#00FF00"
+                android:gravity="center"
+                android:layout_marginBottom="30dp" />
+
+            <!-- Card: Precio Mínimo por KM -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#2a2a2a"
+                android:padding="15dp"
+                android:layout_marginBottom="15dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Precio mínimo/KM"
+                    android:textSize="14sp"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etPrecioKm"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:inputType="numberDecimal"
+                    android:hint="Ej: 5000"
+                    android:padding="10dp"
+                    android:background="#1a1a1a"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#888888"
+                    android:layout_marginTop="8dp" />
+            </LinearLayout>
+
+            <!-- Card: Radio Máximo de Recogida -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#2a2a2a"
+                android:padding="15dp"
+                android:layout_marginBottom="15dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Radio máximo (KM)"
+                    android:textSize="14sp"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etRadioRecogida"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:inputType="numberDecimal"
+                    android:hint="Ej: 5"
+                    android:padding="10dp"
+                    android:background="#1a1a1a"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#888888"
+                    android:layout_marginTop="8dp" />
+            </LinearLayout>
+
+            <!-- Card: Calificación Mínima -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#2a2a2a"
+                android:padding="15dp"
+                android:layout_marginBottom="15dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Calificación mínima"
+                    android:textSize="14sp"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etCalifMin"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:inputType="numberDecimal"
+                    android:hint="Ej: 4.5"
+                    android:padding="10dp"
+                    android:background="#1a1a1a"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#888888"
+                    android:layout_marginTop="8dp" />
+            </LinearLayout>
+
+            <!-- Card: Delay de Seguridad -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#2a2a2a"
+                android:padding="15dp"
+                android:layout_marginBottom="15dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Delay seguridad (ms)"
+                    android:textSize="14sp"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etDelaySeguridad"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:inputType="number"
+                    android:hint="Ej: 1000"
+                    android:padding="10dp"
+                    android:background="#1a1a1a"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#888888"
+                    android:layout_marginTop="8dp" />
+            </LinearLayout>
+
+            <!-- Switch: Activar/Desactivar Bot -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="#2a2a2a"
+                android:padding="15dp"
+                android:layout_marginBottom="15dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Activar Bot"
+                    android:textSize="16sp"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold" />
+
+                <Switch
+                    android:id="@+id/switchBotActivo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <!-- Botón Guardar -->
+            <Button
+                android:id="@+id/btnGuardarConfig"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="GUARDAR CONFIGURACIÓN"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:background="#00FF00"
+                android:textColor="#000000"
+                android:layout_marginBottom="15dp" />
+
+            <!-- Estado del Bot -->
+            <TextView
+                android:id="@+id/txtEstadoBot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🔴 Bot INACTIVO"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#FF0000"
+                android:gravity="center"
+                android:padding="15dp"
+                android:background="#2a2a2a" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</ScrollView>
+
