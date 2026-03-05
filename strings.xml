@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BlackBotEk</string>
+    <string name="registro_pendiente">¡REGISTRO PENDIENTE!</string>
+    <string name="bot_activo">¡BOT ACTIVO!</string>
+    <string name="precio_minimo_km">Precio mínimo/KM</string>
+    <string name="radio_maximo">Radio máximo (KM)</string>
+    <string name="calificacion_minima">Calificación mínima</string>
+    <string name="delay_seguridad">Delay seguridad (ms)</string>
+    <string name="guardar_config">GUARDAR CONFIGURACIÓN</string>
+</resources>
