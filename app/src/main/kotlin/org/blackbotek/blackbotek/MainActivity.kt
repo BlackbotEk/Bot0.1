@@ -5,12 +5,13 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
-import android.widget.EditText
 import android.widget.LinearLayout
-import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -26,57 +27,41 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // 1. Referencias de la interfaz
-        val layoutBloqueo = findViewById<LinearLayout>(R.id.layoutBloqueo)
-        val layoutBot = findViewById<LinearLayout>(R.id.layoutFuncionesBot)
-        val txtID = findViewById<TextView>(R.id.txtIDUsuario)
-        val btnPedirActivacion = findViewById<Button>(R.id.btnPedirActivacion)
-
-        // Campos configurables
-        val etPrecioKm = findViewById<EditText>(R.id.etPrecioKm)
-        val etRadioRecogida = findViewById<EditText>(R.id.etRadioRecogida)
-        val etCalifMin = findViewById<EditText>(R.id.etCalifMin)
-        val etDelaySeguridad = findViewById<EditText>(R.id.etDelaySeguridad)
-        val switchBotActivo = findViewById<Switch>(R.id.switchBotActivo)
-        val btnGuardarConfig = findViewById<Button>(R.id.btnGuardarConfig)
-        val txtEstadoBot = findViewById<TextView>(R.id.txtEstadoBot)
-
-        // 2. Manejo del ID Único
+        // Inicializar SharedPreferences
         prefs = getSharedPreferences("BOT_CONFIG", Context.MODE_PRIVATE)
         idUnico = prefs.getString("user_id", null)
 
+        // Si no existe ID, generar uno
         if (idUnico == null) {
             idUnico = "BOT-" + (1000..9999).random() + "-" + UUID.randomUUID().toString().substring(0, 4).uppercase()
             prefs.edit().putString("user_id", idUnico).apply()
         }
-        txtID.text = "ID: $idUnico"
 
-        // 3. Cargar configuración guardada
-        cargarConfiguracion(etPrecioKm, etRadioRecogida, etCalifMin, etDelaySeguridad, switchBotActivo)
+        // Configurar TabLayout y ViewPager2
+        val tabLayout = findViewById<TabLayout>(R.id.tabLayout)
+        val viewPager = findViewById<ViewPager2>(R.id.viewPager)
 
-        // 4. Botón WhatsApp
-        btnPedirActivacion.setOnClickListener {
-            val numeroAdmin = "5491122334455"
-            val mensaje = "Hola, mi ID es: $idUnico. Solicito activación."
-            val url = "https://wa.me/$numeroAdmin?text=${Uri.encode(mensaje)}"
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-        }
+        // Crear adaptador
+        val adapter = ViewPagerAdapter(this)
+        viewPager.adapter = adapter
 
-        // 5. Botón Guardar Configuración
-        btnGuardarConfig.setOnClickListener {
-            guardarConfiguracion(
-                etPrecioKm, etRadioRecogida, etCalifMin, etDelaySeguridad, switchBotActivo
-            )
-            Toast.makeText(this, "✓ Configuración guardada", Toast.LENGTH_SHORT).show()
-        }
+        // Conectar TabLayout con ViewPager2
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            tab.text = when (position) {
+                0 -> "VELOCIDAD"
+                1 -> "FILTROS"
+                2 -> "RESUMEN"
+                else -> ""
+            }
+        }.attach()
 
-        // 6. Switch para activar/desactivar bot
-        switchBotActivo.setOnCheckedChangeListener { _, isChecked ->
-            txtEstadoBot.text = if (isChecked) "🟢 Bot ACTIVO" else "🔴 Bot INACTIVO"
-            txtEstadoBot.setTextColor(if (isChecked) 0xFF00FF00.toInt() else 0xFFFF0000.toInt())
-        }
+        // Validar estado en Firebase
+        validarEstadoEnFirebase()
+    }
 
-        // 7. EL MOTOR DEL BOT (Validación en Firebase)
+    private fun validarEstadoEnFirebase() {
+        if (idUnico == null) return
+
         val database = FirebaseDatabase.getInstance().getReference("Usuarios").child(idUnico!!)
 
         database.addValueEventListener(object : ValueEventListener {
@@ -85,71 +70,29 @@ class MainActivity : AppCompatActivity() {
                 val diasRestantes = snapshot.child("dias_restantes").getValue(Long::class.java) ?: 0L
 
                 if (estado == "activo" && diasRestantes > 0) {
-                    // ✅ TODO DESBLOQUEADO
-                    layoutBloqueo.visibility = android.view.View.GONE
-                    layoutBot.visibility = android.view.View.VISIBLE
-                    
-                    // El bot está activo y funcionando
-                    configurarFiltrosYBot()
+                    // Bot está activo
+                    prefs.edit().putBoolean("bot_activo", true).apply()
                 } else {
-                    // ❌ TODO BLOQUEADO
-                    layoutBloqueo.visibility = android.view.View.VISIBLE
-                    layoutBot.visibility = android.view.View.GONE
-                    
+                    // Bot no está activo
+                    prefs.edit().putBoolean("bot_activo", false).apply()
+
+                    // Si no existe en Firebase, crear registro
                     if (!snapshot.exists()) {
-                        database.setValue(mapOf(
+                        val nuevosDatos = mapOf(
                             "id" to idUnico,
                             "estado" to "pendiente",
                             "dias_restantes" to 0,
                             "telefono" to prefs.getString("telefono", ""),
                             "fecha_inicio" to System.currentTimeMillis()
-                        ))
+                        )
+                        database.setValue(nuevosDatos)
                     }
                 }
             }
-            override fun onCancelled(error: DatabaseError) {}
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@MainActivity, "Error al conectar con Firebase", Toast.LENGTH_SHORT).show()
+            }
         })
-    }
-
-    // Cargar configuración guardada
-    private fun cargarConfiguracion(
-        etPrecioKm: EditText,
-        etRadioRecogida: EditText,
-        etCalifMin: EditText,
-        etDelaySeguridad: EditText,
-        switchBotActivo: Switch
-    ) {
-        etPrecioKm.setText(prefs.getFloat("precio_km", 0f).toString())
-        etRadioRecogida.setText(prefs.getFloat("radio_recogida", 999f).toString())
-        etCalifMin.setText(prefs.getFloat("calif_min", 0f).toString())
-        etDelaySeguridad.setText(prefs.getLong("delay_seguridad", 1000L).toString())
-        switchBotActivo.isChecked = prefs.getBoolean("bot_activo", false)
-    }
-
-    // Guardar configuración
-    private fun guardarConfiguracion(
-        etPrecioKm: EditText,
-        etRadioRecogida: EditText,
-        etCalifMin: EditText,
-        etDelaySeguridad: EditText,
-        switchBotActivo: Switch
-    ) {
-        val editor = prefs.edit()
-        editor.putFloat("precio_km", etPrecioKm.text.toString().toFloatOrNull() ?: 0f)
-        editor.putFloat("radio_recogida", etRadioRecogida.text.toString().toFloatOrNull() ?: 999f)
-        editor.putFloat("calif_min", etCalifMin.text.toString().toFloatOrNull() ?: 0f)
-        editor.putLong("delay_seguridad", etDelaySeguridad.text.toString().toLongOrNull() ?: 1000L)
-        editor.putBoolean("bot_activo", switchBotActivo.isChecked)
-        editor.apply()
-    }
-
-    // Configurar filtros y bot
-    private fun configurarFiltrosYBot() {
-        val precioMin = prefs.getFloat("precio_km", 0f)
-        val radioMax = prefs.getFloat("radio_recogida", 999f)
-        val califMin = prefs.getFloat("calif_min", 0f)
-        val delay = prefs.getLong("delay_seguridad", 1000L)
-        
-        // BotService.kt usará estos valores para funcionar
     }
 }
